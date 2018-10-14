@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间应该是对应接口的包名+接口名 -->
+<mapper namespace="com.hua.dao.UserDao">
+
+
+    <insert id="insertUserRoles">
+        INSERT INTO user_role(userId,roleId) VALUES
+        <foreach collection="roleIds" item="roleId" separator=",">
+            (#{userId},#{roleId})
+        </foreach>
+    </insert>
+
+    <delete id="deleteUserRoles">
+        DELETE FROM user_role WHERE userId=#{userId} and roleId in
+        <foreach collection="roleIds" item="roleId" separator="," open="(" close=")">
+            #{roleId}
+        </foreach>
+    </delete>
+
+    <!--批量删除-->
+    <delete id="deleteUsers">
+        DELETE FROM USER
+        WHERE id IN
+        <foreach collection="userIds" separator="," item="userId" open="(" close=")" >
+            #{userId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteUser">
+        DELETE FROM USER
+        WHERE id=#{id}
+    </delete>
+
+
+
+
+
+    <update id="updateUser">
+        UPDATE USER
+        SET account=#{account},username=#{username},email=#{email}
+        where id=#{id}
+    </update>
+
+
+
+    <!--验证查询-->
+    <select id="query4Validate" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM USER
+        <where>
+            <if test="username!=null">
+                AND username=#{username}
+            </if>
+            <if test="account!=null">
+                OR account=#{account}
+            </if>
+        </where>
+    </select>
+
+    <!--往数据中添加用户的信息-->
+    <insert id="addUser">
+        INSERT INTO USER(username,account,password,email,createTime)
+        VALUES (
+        #{username},#{account},#{password},#{email},#{createTime}
+        )
+    </insert>
+
+    <!--分页查询出用户信息-->
+    <select id="pageQueryUser" resultType="com.hua.entity.User">
+        SELECT * FROM USER
+        <where>
+            <if test="queryText!=null">
+                AND account LIKE concat('%',#{queryText},'%')
+            </if>
+        </where>
+        order BY createTime desc
+         limit #{start},#{pageSize}
+    </select>
+
+
+    <select id="pageQueryCount" resultType="java.lang.Integer">
+        SELECT count(*) FROM USER
+        <where>
+            <if test="queryText!=null">
+                AND account LIKE concat('%',#{queryText},'%')
+            </if>
+        </where>
+    </select>
+
+</mapper>

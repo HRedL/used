@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--命名空间应该是对应接口的包名+接口名 -->
+<mapper namespace="com.hua.dao.RoleDao">
+
+    <insert id="insertRolePermission">
+        INSERT INTO Role_permission(roleId,permissionId) VALUES
+        <foreach collection="permissionIds" item="permissionId" separator=",">
+            (#{roleId},#{permissionId})
+        </foreach>
+    </insert>
+
+    <select id="queryAllRole" resultType="com.hua.entity.Role">
+        SELECT * FROM role
+    </select>
+
+
+    <!--分页查询出用户信息-->
+    <select id="pageQueryRole" resultType="com.hua.entity.Role">
+        SELECT * FROM ROLE
+        <where>
+            <if test="queryText!=null">
+                AND name LIKE concat('%',#{queryText},'%')
+            </if>
+        </where>
+        limit #{start},#{pageSize}
+    </select>
+
+
+    <select id="pageQueryCount" resultType="java.lang.Integer">
+        SELECT count(*) FROM ROLE
+        <where>
+            <if test="queryText!=null">
+                AND name LIKE concat('%',#{queryText},'%')
+            </if>
+        </where>
+    </select>
+
+</mapper>
